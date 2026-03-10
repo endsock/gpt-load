@@ -255,6 +255,13 @@ func (ps *ProxyServer) executeRequestWithRetry(
 			return
 		}
 
+		// 退避重试：等待 2^(n+1) 秒，最大 10 秒
+		backoffSeconds := 2 << retryCount // 2^(retryCount+1)
+		if backoffSeconds > 10 {
+			backoffSeconds = 10
+		}
+		time.Sleep(time.Duration(backoffSeconds) * time.Second)
+
 		ps.executeRequestWithRetry(c, channelHandler, originalGroup, group, bodyBytes, isStream, startTime, retryCount+1)
 		return
 	}
