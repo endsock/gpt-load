@@ -312,7 +312,7 @@ func (ps *ProxyServer) logRequest(
 	var requestBodyToLog, userAgent string
 
 	if group.EffectiveConfig.EnableRequestBodyLogging {
-		requestBodyToLog = utils.TruncateString(string(bodyBytes), 65000)
+		requestBodyToLog = string(bodyBytes)
 		userAgent = c.Request.UserAgent()
 	}
 
