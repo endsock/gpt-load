@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"gpt-load/internal/channel"
@@ -311,7 +312,15 @@ func (ps *ProxyServer) logRequest(
 
 	var requestBodyToLog, userAgent string
 
-	if group.EffectiveConfig.EnableRequestBodyLogging {
+	shouldLogBody := group.EffectiveConfig.EnableRequestBodyLogging
+	if !shouldLogBody && finalError != nil {
+		errMsg := finalError.Error()
+		if strings.Contains(errMsg, "Improperly formed request") {
+			shouldLogBody = true
+		}
+	}
+
+	if shouldLogBody {
 		requestBodyToLog = string(bodyBytes)
 		userAgent = c.Request.UserAgent()
 	}
